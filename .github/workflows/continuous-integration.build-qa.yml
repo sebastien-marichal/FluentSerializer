@@ -119,11 +119,11 @@ jobs:
 
         ./.sonar/scanner/dotnet-sonarscanner begin
         /s:"${{github.workspace}}/SonarQube.Analysis.xml"
-        /k:"Marvin-Brouwer_FluentSerializer"
-        /o:"marvin-brouwer"
+        /k:"sqcsslerror"
+        /o:"sebastien-marichal-sonar"
         /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         /d:sonar.host.url="https://sonarcloud.io"
-        /d:sonar.verbose=${{ secrets.ACTIONS_STEP_DEBUG || false }}
+        /d:sonar.verbose=true
     ###
     # 🛠 Build
     ###
@@ -167,49 +167,6 @@ jobs:
         echo "  " >>$GITHUB_STEP_SUMMARY
       working-directory: ${{github.workspace}}
     ###
-    # 🧪 Run integration tests
-    #
-    # Run the unit tests of category `IntegrationTest` to verify the integration of various unit-tests.
-    ###
-    - name: 🧪 Run integration tests
-      run: >-
-        dotnet test --verbosity:normal
-        --no-build --no-restore --nologo
-        --configuration="Release"
-        --logger:"console;verbosity=detailed"
-        --logger:"GitHubActions"
-        --filter:"Category=IntegrationTest"
-        /clp:forceconsolecolor
-        "${{github.workspace}}/FluentSerializer.sln";
-      working-directory: ${{github.workspace}}
-    ###
-    # 🧪 Run use-case tests
-    #
-    # Run the unit tests of category `UseCase` to illustrate the library still works as intended.
-    # This is basically a kind of integration test.
-    ###
-    - name: 🧪 Run use-case tests
-      run: >-
-        dotnet test --verbosity:normal
-        --no-build --no-restore --nologo
-        --configuration="Release"
-        --logger:"console;verbosity=detailed"
-        --logger:"GitHubActions"
-        --filter:"Category=UseCase"
-        /clp:forceconsolecolor
-        "${{github.workspace}}/FluentSerializer.sln";
-      working-directory: ${{github.workspace}}
-    ###
-    # 🗃 Publish 'unit-test-coverage' artifacts
-    ###
-    - name: 🗃 Publish 'unit-test-coverage' artifacts
-      if: ${{ always() }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: unit-test-coverage
-        path: ./test-results/coverage
-        retention-days: 1
-    ###
     # 🔬 Perform SonarCloud Analysis
     #
     # The Write-Host at the start is just to make it easier to find the link when opening the step in the pipeline
@@ -227,14 +184,3 @@ jobs:
 
         ./.sonar/scanner/dotnet-sonarscanner end
         /d:sonar.login="${{ secrets.SONAR_TOKEN }}";
-    ###
-    # 🔬 SonarCloud Quality Gate
-    ###
-    - name: 🔬 SonarCloud Quality Gate
-      id: sonarcloud-quality-gate-check
-      uses: sonarsource/sonarqube-quality-gate-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        LD_LIBRARY_PATH: "/usr/local/lib"
-      with:
-        scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt

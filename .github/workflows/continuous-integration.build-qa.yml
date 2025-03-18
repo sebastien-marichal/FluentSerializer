@@ -64,12 +64,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        LD_LIBRARY_PATH: "/usr/local/lib"
       run: >-
         [System.IO.Directory]::CreateDirectory('${{github.workspace}}/.sonar/scanner')
 
         dotnet tool install dotnet-sonarscanner --tool-path '${{github.workspace}}/.sonar/scanner'
 
+        dotnet --info
         ./.sonar/scanner/dotnet-sonarscanner begin
         /s:"${{github.workspace}}/SonarQube.Analysis.xml"
         /k:"sqcsslerror"

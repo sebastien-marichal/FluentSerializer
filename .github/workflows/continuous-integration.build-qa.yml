@@ -67,9 +67,10 @@ jobs:
       run: >-
         [System.IO.Directory]::CreateDirectory('${{github.workspace}}/.sonar/scanner')
 
+        dotnet --info
+
         dotnet tool install dotnet-sonarscanner --tool-path '${{github.workspace}}/.sonar/scanner'
 
-        dotnet --info
         ./.sonar/scanner/dotnet-sonarscanner begin
         /s:"${{github.workspace}}/SonarQube.Analysis.xml"
         /k:"sqcsslerror"
